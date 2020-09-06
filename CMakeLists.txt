@@ -36,16 +36,10 @@ set(PROJECT_HEADERS "${CMAKE_SOURCE_DIR}/include/libespm/FormId.h"
                     "${CMAKE_SOURCE_DIR}/include/libespm/Record.h"
                     "${CMAKE_SOURCE_DIR}/include/libespm/Subrecord.h")
 
-set(TESTER_SRC "${CMAKE_SOURCE_DIR}/src/tests/main.cpp")
-
-set(TESTER_HEADERS "${CMAKE_SOURCE_DIR}/src/tests/PluginTest.h"
-                   "${CMAKE_SOURCE_DIR}/src/tests/FormIdTest.h")
-
-source_group("Header Files" FILES ${PROJECT_HEADERS} ${TESTER_HEADERS})
+source_group("Header Files" FILES ${PROJECT_HEADERS})
 
 # Include source and library directories.
-include_directories("${CMAKE_SOURCE_DIR}/src"
-                    "${CMAKE_SOURCE_DIR}/include"
+include_directories("${CMAKE_SOURCE_DIR}/include"
                      ${Boost_INCLUDE_DIRS}
                      ${GTEST_INCLUDE_DIRS})
 
@@ -76,18 +70,3 @@ else (MSVC)
         ENDFOREACH()
     ENDIF ()
 endif ()
-
-##############################
-# Define Targets
-##############################
-
-add_executable        (tests ${TESTER_SRC} ${PROJECT_HEADERS} ${TESTER_HEADERS})
-add_dependencies      (tests GTest testing-plugins)
-target_link_libraries (tests ${GTEST_LIBRARIES} ${Boost_LIBRARIES} ${PROJECT_LIBRARIES})
-
-# Copy testing plugins
-ExternalProject_Get_Property(testing-plugins SOURCE_DIR)
-add_custom_command(TARGET tests POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${SOURCE_DIR}
-        $<TARGET_FILE_DIR:tests>)
