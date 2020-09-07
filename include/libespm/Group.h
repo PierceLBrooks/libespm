@@ -22,6 +22,7 @@
 
 #include <cstdint>
 #include <istream>
+#include <vector>
 #include <set>
 
 #include "Record.h"
@@ -30,11 +31,15 @@ namespace libespm {
   class Group {
   private:
     std::set<uint32_t> formIds;
+    std::vector<Record> records;
+    
 
     static const uint32_t groupType = 0x50555247;  //"GRUP"
     static const int typeLength = 4;
   public:
     inline void read(std::istream& input, GameId gameId, bool skipSubrecords) {
+      records.clear();
+      
       // Header length varies by game.
       size_t headerLengthToSkip = getHeaderLengthToSkip(gameId);
 
@@ -42,8 +47,12 @@ namespace libespm {
       readRecords(input, gameId, totalRecordsSize, skipSubrecords);
     }
 
-    inline std::set<uint32_t> getRecordFormIds() const {
+    inline const std::set<uint32_t>& getRecordFormIds() const {
       return formIds;
+    }
+    
+    inline const std::vector<Record>& getRecords() const {
+      return records;
     }
 
   private:
@@ -76,6 +85,7 @@ namespace libespm {
           Record record;
           record.read(input, gameId, skipSubrecords);
           formIds.insert(record.getFormId());
+          records.push_back(record);
         }
       }
     }

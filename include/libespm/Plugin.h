@@ -41,6 +41,7 @@ namespace libespm {
     std::string name;
     Record headerRecord;
     std::set<FormId> formIds;
+    std::vector<Record> records;
 
   public:
     inline Plugin(GameId gameId) : gameId(gameId) {}
@@ -72,14 +73,18 @@ namespace libespm {
           Record record;
           record.read(input, gameId, false);
           formIds.insert(FormId(trimmedName, masters, record.getFormId()));
+          records.push_back(record);
         }
       }
       else {
         while (input.good() && (uintmax_t)input.tellg() < fileSize) {
           Group group;
-          group.read(input, gameId, true);
+          group.read(input, gameId, false);
           for (const auto& formId : group.getRecordFormIds()) {
             formIds.insert(FormId(trimmedName, masters, formId));
+          }
+          for (const auto& record : group.getRecords()) {
+            records.push_back(record);
           }
         }
       }
@@ -154,6 +159,10 @@ namespace libespm {
 
       return formIds;
     }
+    
+    inline const std::vector<Record>& getRecords() const {
+      return records;
+    }
 
     inline uint32_t getRecordAndGroupCount() const {
       ptrdiff_t countOffset(4);
@@ -169,7 +178,6 @@ namespace libespm {
       return 0;
     }
 
-  private:
     inline static std::string trimToEspm(const std::string& filename) {
       size_t pos = filename.find(".esp");
       if (pos != std::string::npos && pos != filename.length() - 4)
