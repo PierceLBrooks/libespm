@@ -35,7 +35,7 @@
 
 namespace libespm {
   class Plugin {
-  private:
+  protected:
     GameId gameId;
 
     std::string name;
@@ -148,7 +148,7 @@ namespace libespm {
       return "";
     }
 
-    inline std::set<FormId> getFormIds() const {
+    inline const std::set<FormId>& getFormIds() const {
       if (gameId == GameId::MORROWIND)
         throw std::domain_error("Cannot get FormIDs for a Morrowind plugin: Morrowind does not use FormIDs.");
 
